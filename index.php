@@ -11,20 +11,79 @@
     <title>Hello, world!</title>
   </head>
   <body>
+    <?php require_once'process.php';?>
+    <?php
+    $database = new mysqli('localhost','root','','database') or die(mysqli_error($database));
+    $result = $database->query("SELECT * FROM users") or die($database->error);
+
+    ?>
     <div class="container" style="margin-top:100px">
-    <form action="" method="POST">
-    <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    <?php
+        if(isset($_SESSION['message'])) : 
+    ?>
+    <div class="alert alert-<?=$_SESSION['msg_type']?>">
+        <?php
+            echo $_SESSION['message'];
+            unset($_SESSION['message']);
+        ?>
     </div>
-    <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1">
+<?php endif?>
+    <h1>Welcome Bro!</h1>
+    <form action="process.php" method="POST">
+        
+        <div class="mb-2">
+       
+         <input type="hidden" class="form-control" value="<?php echo $id;?>" name="id">
+       
     </div>
-    
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="mb-2">
+        <label for="exampleInputEmail1" class="form-label">Name</label>
+        <input type="text" class="form-control" value="<?php echo $name;?>" name="name">
+       
+    </div>
+    <div class="mb-2">
+        <label for="exampleInputPassword1" class="form-label">Location</label>
+        <input type="text" class="form-control" value="<?php echo $location;?>" name="location" >
+    </div>
+    <?php 
+        if($update == true):
+    ?>
+
+    <button type="submit" class="btn btn-info" name="update">Update</button>
+
+    <?php else: ?>
+
+       <button type="submit" class="btn btn-primary" name="save">Save</button> 
+
+    <?php endif;?> 
     </form>
+    <div class="card" style="margin-top: 20px">
+        <div class="mb-2">
+            <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th colspan="2">Action</th>
+            </tr>
+        </thead>
+       
+        
+        <tbody>
+             <?php while ($row = $result->fetch_assoc()): ?>
+                <tr> 
+                    <td><?php echo $row['name'];?></td>
+                    <td><?php echo $row['location'];?></td>
+                    <td>
+                        <a href="index.php?edit=<?php echo $row['id']?>" class="btn btn-info">Edit</a>
+                        <a href="process.php?delete=<?php echo $row['id']?>" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+        </div>
+    </div>
     </div>
     
     <!-- Optional JavaScript; choose one of the two! -->
